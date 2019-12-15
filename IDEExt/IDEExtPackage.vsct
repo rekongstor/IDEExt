@@ -60,7 +60,6 @@
         </Strings>
       </Button>
     </Buttons>
-
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
       <!--  The bitmap id is defined in a way that is a little bit different from the others:
@@ -72,6 +71,10 @@
     </Bitmaps>
   </Commands>
 
+  <KeyBindings>
+    <KeyBinding guid="guidIDEExtPackageCmdSet" id="cdeclId" editor="guidSourceCodeTextEditor" key1="3" mod1="Control"/>
+  </KeyBindings>
+  
   <Symbols>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidIDEExtPackage" value="{ce4c5a28-2cd0-49dd-84b7-0e0334ed9002}" />
@@ -81,6 +84,7 @@
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cdeclId" value="0x0100" />
     </GuidSymbol>
+    <GuidSymbol name ="guidSourceCodeTextEditor" value="{8b382828-6202-11d1-8870-0000f87579d2}" />
 
     <GuidSymbol name="guidImages" value="{954f4246-16ca-458e-9c86-bb2d3b323756}" >
       <IDSymbol name="bmpPic1" value="1" />
