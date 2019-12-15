@@ -7,6 +7,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 using EnvDTE;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace IDEExt
 {
@@ -82,7 +84,12 @@ namespace IDEExt
 
         private string Translate(string text)
         {
-            return "1";
+            if (text.Contains("\n")) // должна быть одна строка
+                return "";
+            text = Regex.Replace(text,@"(\s)\s+", " "); // заменить все множественные табуляции одним пробелом
+            var spl = text.Split(' '); // делим строку на слова
+            var varname = spl[spl.Length - 1]; // последнее - это идентификатор
+            return "Declare " + varname;
         }
 
         /// <summary>
