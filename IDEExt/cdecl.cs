@@ -82,14 +82,112 @@ namespace IDEExt
             Instance = new cdecl(package, commandService);
         }
 
+        private bool Replace(ref string Text, string What, string With)
+        {
+            Text = Text.Replace(What, With);
+            if (Text.Length == 0)
+                return true;
+            return false;
+        }
+        
         private string Translate(string text)
         {
             if (text.Contains("\n")) // должна быть одна строка
                 return "";
+            string res = "Declare ";
             text = Regex.Replace(text,@"(\s)\s+", " "); // заменить все множественные табуляции одним пробелом
             var spl = text.Split(' '); // делим строку на слова
-            var varname = spl[spl.Length - 1]; // последнее - это идентификатор
-            return "Declare " + varname;
+            var ptr = spl.Length - 1;
+            var varname = spl[ptr--]; // последнее - это идентификатор
+            varname = varname.Replace(";", "");
+            res += varname + " as a ";
+            bool const_decl, pointer_decl;
+
+            while (ptr >= 0)
+            {
+                if (spl[ptr].Contains("*"))
+                {
+                    res += "pointer to ";
+                    if (Replace(ref spl[ptr], "*", ""))
+                        ptr--;
+                    continue;
+                }
+                if (spl[ptr].Contains("&"))
+                {
+                    res += "reference to ";
+                    if (Replace(ref spl[ptr], "&", ""))
+                        ptr--;
+                    continue;
+                }
+                if (spl[ptr].Contains("const"))
+                {
+                    res += "constant ";
+                    Replace(ref spl[ptr], "const", "");
+                    ptr--;
+                    if (ptr >= 0)
+                    {
+                        if (spl[ptr].Contains("*"))
+                        {
+                            res += "pointer to ";
+                            Replace(ref spl[ptr], "*", "");
+                            continue;
+                        }
+                        if (spl[ptr].Contains("&"))
+                        {
+                            res += "reference to ";
+                            Replace(ref spl[ptr], "&", "");
+                            continue;
+                        }
+                        if (spl[ptr] != "")
+                        res += spl[ptr] + " ";
+                        spl[ptr] = "";
+                    }
+                    ptr--;
+                }
+                else
+                {
+                    if (ptr - 1 >= 0)
+                    {
+                        if (spl[ptr - 1].Contains("const"))
+                        {
+                            res += "constant ";
+                            Replace(ref spl[ptr - 1], "const", "");
+                            if (spl[ptr].Contains("*"))
+                            {
+                                res += "pointer to ";
+                                Replace(ref spl[ptr], "*", "");
+                                ptr--;
+                                continue;
+                            }
+                            if (spl[ptr].Contains("&"))
+                            {
+                                res += "reference to ";
+                                Replace(ref spl[ptr], "&", "");
+                                ptr--;
+                                continue;
+                            }
+                            res += spl[ptr] + " ";
+                            if (spl[ptr] != "")
+                                spl[ptr] = "";
+                            ptr--;
+                        }
+                        else
+                        {
+                            res += spl[ptr] + " ";
+                            spl[ptr] = "";
+                            ptr--;
+                        }
+                    }
+                    else
+                    {
+                        res += spl[ptr];
+                        spl[ptr] = "";
+                        ptr--;
+                    }
+
+                }
+            }
+            return Regex.Replace(res, @"(\s)\s+", " ");
         }
 
         /// <summary>
@@ -108,13 +206,15 @@ namespace IDEExt
             // Show a message box to prove we were here
             string message = Translate(ts.Text);
             if (message != "")
-                VsShellUtilities.ShowMessageBox(
-                    this.package,
-                    message, 
-                    title, 
-                    OLEMSGICON.OLEMSGICON_INFO,
-                    OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            {
+                IVsStatusbar statusBar = (IVsStatusbar)Package.GetGlobalService(typeof(SVsStatusbar));
+                int frozen;
+                statusBar.IsFrozen(out frozen);
+                if (frozen != 0)
+                    statusBar.FreezeOutput(0);
+                statusBar.SetText(message);
+                statusBar.FreezeOutput(1);
+            }
         }
 
     }
