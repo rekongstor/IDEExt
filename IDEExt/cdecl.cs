@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
+using EnvDTE;
 
 namespace IDEExt
 {
@@ -90,16 +91,18 @@ namespace IDEExt
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "cdecl";
-
+            string title = "Command1";
+            DTE dte = Package.GetGlobalService(typeof(SDTE)) as DTE;
+            TextSelection ts = (TextSelection)dte.ActiveDocument.Selection;
             // Show a message box to prove we were here
             VsShellUtilities.ShowMessageBox(
                 this.package,
-                message,
+                ts.Text,
                 title,
                 OLEMSGICON.OLEMSGICON_INFO,
                 OLEMSGBUTTON.OLEMSGBUTTON_OK,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
+
     }
 }
