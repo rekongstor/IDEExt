@@ -80,6 +80,11 @@ namespace IDEExt
             Instance = new cdecl(package, commandService);
         }
 
+        private string Translate(string text)
+        {
+            return "1";
+        }
+
         /// <summary>
         /// This function is the callback used to execute the command when the menu item is clicked.
         /// See the constructor to see how the menu item is associated with this function using
@@ -92,16 +97,17 @@ namespace IDEExt
             ThreadHelper.ThrowIfNotOnUIThread();
             DTE dte = Package.GetGlobalService(typeof(SDTE)) as DTE;
             TextSelection ts = (TextSelection)dte.ActiveDocument.Selection;
-            string message = ts.Text;
-            string title = "Translated " + ts.Text;
+            string title = ts.Text;
             // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.package,
-                title, 
-                message, 
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            string message = Translate(ts.Text);
+            if (message != "")
+                VsShellUtilities.ShowMessageBox(
+                    this.package,
+                    message, 
+                    title, 
+                    OLEMSGICON.OLEMSGICON_INFO,
+                    OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
 
     }
