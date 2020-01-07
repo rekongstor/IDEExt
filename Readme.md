@@ -1,4 +1,4 @@
-﻿MO Project - Поиск пути C++
+﻿IDE Ext - плагин для Visual Studio
 ==========================
 
 ## General
